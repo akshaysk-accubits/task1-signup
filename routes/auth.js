@@ -6,8 +6,9 @@ require("../models/signup");
 require("dotenv").config();
 const saltRounds = 10;
 const User = require("../models/signup");
+const userValidation = require("../validation")
 
-router.post("/register", async (req, res) => {
+router.post("/register", userValidation, async (req, res) => {
   let { Firstname, Lastname, email, password, date_of_birth, phonenumber } =
     req.body;
   if (!Firstname) {
