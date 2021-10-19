@@ -14,13 +14,16 @@ require('./models/signup')
 app.use('/authentication',require('./routes/auth'))
 
 
-// const signupsRoute = require("./routes/signups");
-// app.use('/signups',signupsRoute);
-
-
-mongoose.connect("mongodb://localhost:27017/login");
-mongoose.set("debug",true);
-console.log("DB Connected");
+//connect to DB
+mongoose.connect(
+    process.env.DB_URL,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+    (err) => {
+      if (err) {
+        console.log(" err ", err);
+      } else console.log("Connected to DB");
+    }
+  );
 
 app.listen(process.env.PORT, (err) => {
     if (err) {
