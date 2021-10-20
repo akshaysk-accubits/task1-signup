@@ -6,30 +6,12 @@ require("../models/signup");
 require("dotenv").config();
 const saltRounds = 10;
 const User = require("../models/signup");
-const userValidation = require("../validation")
+const userValidation = require("../validation");
+const validateToken = require("../jwt-helper").validateToken;
 
 router.post("/register", userValidation, async (req, res) => {
-  let { Firstname, Lastname, email, password, date_of_birth, phonenumber } =
+  let { Firstname, Lastname, email, password, DateofBirth, phonenumber } =
     req.body;
-  if (!Firstname) {
-    return res.status(400).json({ message: "First name is required!" });
-  }
-  if (!Lastname) {
-    return res.status(400).json({ message: "Last name is required!" });
-  }
-  if (!email) {
-    return res.status(400).json({ message: "email is required!" });
-  }
-  if (!password) {
-    return res.status(400).json({ message: "password is required!" });
-  }
-  if (!date_of_birth) {
-    return res.status(400).json({ message: "Date of Birth is required!" });
-  }
-  if (!phonenumber) {
-    return res.status(400).json({ message: "Phonenumber is required!" });
-  }
-
   const usercount = await User.countDocuments({ email });
   if (usercount > 0) {
     return res.json({ message: "Email already in use!" });
@@ -42,7 +24,7 @@ router.post("/register", userValidation, async (req, res) => {
       Lastname,
       email,
       password: hash,
-      date_of_birth,
+      DateofBirth,
       phonenumber,
     })
       .then(async (user) => {
@@ -94,7 +76,7 @@ router.post("/login", async (req, res) => {
 
 //get the users list
 
-router.get("/list", async (req, res) => {
+router.get("/list", validateToken, async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -103,11 +85,9 @@ router.get("/list", async (req, res) => {
   }
 });
 
-
 //get user by Id
 
-
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateToken, async (req, res) => {
   try {
     const byId = await User.findById(req.params.id);
     res.status(200).json(byId);
@@ -116,19 +96,17 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
-
 //get the user by phonenumber
 
-router.get("/:phonenumber", async (req, res) => {
-    try {
-    const byphonenum = await User.findOne({phonenumber:req.params.phonenumber});
-       res.status(200).json(byphonenum);
-    } catch (err) {
-      return res.status(500).json(err);
-    }
-  });
-  
+router.get("/:phonenumber", validateToken, async (req, res) => {
+  try {
+    const userid = await User.findOne({ phonenumber: req.params.phonenumber });
+    res.status(200).json(userid);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
 //delete the user by id
 
 router.delete("/:id", async (req, res) => {
@@ -139,6 +117,5 @@ router.delete("/:id", async (req, res) => {
     return res.status(500).json(err);
   }
 });
-
 
 module.exports = router;

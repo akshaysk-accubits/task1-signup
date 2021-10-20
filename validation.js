@@ -7,8 +7,8 @@ const errorFunction = (errorBit, msg, data) => {
 
 const validation = joi.object({
   Firstname: joi.string().alphanum().min(3).max(25).trim(true).required(),
-  Lastname: joi.string().alphanum().min(3).max(25).trim(true).required(),
-  date_of_birth: joi.string().min(3).max(2000),
+  Lastname: joi.string().alphanum().min(2).max(25).trim(true).required(),
+  DateofBirth: joi.string().min(3).max(2000),
   email: joi.string().email().trim(true).required(),
   password: joi.string().min(8).trim(true).required(),
   phonenumber: joi
@@ -22,7 +22,7 @@ const userValidation = async (req, res, next) => {
     Firstname: req.body.Firstname,
     Lastname: req.body.Lastname,
 
-    date_of_birth: req.body.date_of_birth,
+    DateofBirth: req.body.DateofBirth,
     email: req.body.email,
     password: req.body.password,
     phonenumber: req.body.phonenumber,

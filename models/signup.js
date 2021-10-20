@@ -1,5 +1,5 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
-const validator = require("validator");
 const loginSchema = new mongoose.Schema({
   Firstname: {
     type: String,
@@ -13,7 +13,7 @@ const loginSchema = new mongoose.Schema({
     min: 3,
     max: 20,
   },
-  date_of_birth: {
+  DateofBirth: {
     type: String,
     required: true,
   },
@@ -23,11 +23,6 @@ const loginSchema = new mongoose.Schema({
     required: true,
     max: 50,
     unique: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Invalid Email");
-      }
-    },
   },
   password: {
     type: String,
@@ -35,7 +30,7 @@ const loginSchema = new mongoose.Schema({
     min: 6,
   },
   phonenumber: {
-    type: Number,
+    type: String,
     required: true,
     //max:11,
   },
