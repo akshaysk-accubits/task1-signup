@@ -1,7 +1,7 @@
 var nodemailer = require('nodemailer');
 const mailGun = require('nodemailer-mailgun-transport');
-require('./models/signup');
-require('./routes/auth');
+require('../models/signup');
+require('../routes/auth');
 
 
 const auth = {

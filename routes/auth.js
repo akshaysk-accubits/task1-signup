@@ -1,31 +1,35 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sendMail = require("../mail");
+const sendMail = require("../middlewares/mail");
 require("../models/signup");
 require("dotenv").config();
 const saltRounds = 10;
 const User = require("../models/signup");
-const userValidation = require("../validation");
-const validateToken = require("../jwt-helper").validateToken;
+const userValidation = require("../middlewares/validation");
+const loginValidation = require("../middlewares/validation");
+const validateToken = require("../middlewares/jwt-helper").validateToken;
+require("../middlewares/jwt-helper")
+const checkUser = require("../middlewares/jwt-helper").checkUser;
+
 
 router.post("/register", userValidation, async (req, res) => {
-  let { Firstname, Lastname, email, password, DateofBirth, phonenumber } =
+  let { firstName, lastName, email, password, dateOfBirth, phoneNumber } =
     req.body;
   const usercount = await User.countDocuments({ email });
   if (usercount > 0) {
-    return res.json({ message: "Email already in use!" });
+    return res.json({ message: "email already in use!" });
   }
 
   bcrypt.hash(password, saltRounds, function (err, hash) {
     // Store hash in your password DB.
     User.create({
-      Firstname,
-      Lastname,
+      firstName,
+      lastName,
       email,
       password: hash,
-      DateofBirth,
-      phonenumber,
+      dateOfBirth,
+      phoneNumber,
     })
       .then(async (user) => {
         await sendMail.sendMail(user.email);
@@ -42,7 +46,7 @@ router.post("/register", userValidation, async (req, res) => {
   });
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginValidation, async (req, res) => {
   let { email, password } = req.body;
   if (!email) {
     return res.status(400).json({ message: "email is required!" });
@@ -74,9 +78,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+//check the user
+router.get("/userDetails", checkUser);
+
+
+
 //get the users list
 
-router.get("/list", validateToken, async (req, res) => {
+router.get("/list", checkUser,  async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -96,11 +106,11 @@ router.get("/:id", validateToken, async (req, res) => {
   }
 });
 
-//get the user by phonenumber
+//get the user by phoneNumber
 
-router.get("/:phonenumber", validateToken, async (req, res) => {
+router.get("/:phoneNumber", validateToken, async (req, res) => {
   try {
-    const userid = await User.findOne({ phonenumber: req.params.phonenumber });
+    const userid = await User.findOne({ phoneNumber: req.params.phoneNumber });
     res.status(200).json(userid);
   } catch (err) {
     return res.status(500).json(err);
@@ -109,7 +119,7 @@ router.get("/:phonenumber", validateToken, async (req, res) => {
 
 //delete the user by id
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateToken, async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
     res.status(200).json("Account has been deleted");

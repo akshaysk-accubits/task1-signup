@@ -1,19 +1,19 @@
 const { string } = require("joi");
 const mongoose = require("mongoose");
 const loginSchema = new mongoose.Schema({
-  Firstname: {
+  firstName: {
     type: String,
     require: true,
     min: 3,
     max: 20,
   },
-  Lastname: {
+  lastName: {
     type: String,
     require: true,
     min: 3,
     max: 20,
   },
-  DateofBirth: {
+  dateOfBirth: {
     type: String,
     required: true,
   },
@@ -29,7 +29,7 @@ const loginSchema = new mongoose.Schema({
     required: true,
     min: 6,
   },
-  phonenumber: {
+  phoneNumber: {
     type: String,
     required: true,
     //max:11,
