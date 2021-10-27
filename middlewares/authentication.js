@@ -13,7 +13,7 @@ const User = require("../models/signup");
       try {
         result = jwt.verify(token, process.env.SECRET, options);
         req.decoded = result;
-        
+        //res.json({message:result});
         //console.log(result);
         
         next();

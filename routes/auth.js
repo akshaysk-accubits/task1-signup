@@ -8,9 +8,11 @@ const saltRounds = 10;
 const User = require("../models/signup");
 const userValidation = require("../middlewares/validation");
 const loginValidation = require("../middlewares/validation");
-const validateToken = require("../middlewares/jwt-helper").validateToken;
-require("../middlewares/jwt-helper")
-const checkUser = require("../middlewares/jwt-helper").checkUser;
+const validateToken = require("../middlewares/authentication").validateToken;
+require("../middlewares/authentication")
+const checkUser = require("../middlewares/authentication").checkUser;
+const upload = require("../middlewares/uploadFile");
+
 
 
 router.post("/register", userValidation, async (req, res) => {
@@ -80,13 +82,22 @@ router.post("/login", loginValidation, async (req, res) => {
 
 
 //check the user
-router.get("/userDetails", checkUser);
+router.get("/userDetails", validateToken,  async (req, res) => {
+  try {
+    const result = req.decoded;
+    let user = await User.findById(result.id);
+        res.status(200).json(user);
+       
+      } catch (err) {
+        res.status(500).json(err);
 
+      }});
+    
 
 
 //get the users list
 
-router.get("/list", checkUser,  async (req, res) => {
+router.get("/list", validateToken,  async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -119,13 +130,33 @@ router.get("/:phoneNumber", validateToken, async (req, res) => {
 
 //delete the user by id
 
-router.delete("/:id", validateToken, async (req, res) => {
+router.delete("/:id", validateToken,  async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.status(200).json("Account has been deleted");
+    res.status(201).json({
+      message: "Account Deleted",
+      Delete_by:req.decoded
+    });
   } catch (err) {
     return res.status(500).json(err);
   }
 });
 
+
+//upload a file
+
+router.post("/single", upload.single("image"), (req, res) => {
+  console.log(req.file);
+  res.send("Single FIle upload success");
+});
+
+
+// Multiple Files Route Handler
+router.post("/multiple", upload.array("images", 3), (req, res) => {
+  console.log(req.files);
+  res.send("Multiple Files Upload Success");
+});
+
+
 module.exports = router;
+    

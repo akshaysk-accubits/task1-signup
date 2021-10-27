@@ -1,9 +1,12 @@
 const joi = require("joi");
+require("../utils/validationSchema");
+
 
 const errorFunction = (errorBit, msg, data) => {
   if (errorBit) return { is_error: errorBit, message: msg };
   else return { is_error: errorBit, message: msg, data };
 };
+
 
 const validation = joi.object({
   firstName: joi.string().alphanum().min(3).max(25).trim(true).required(),
@@ -18,10 +21,6 @@ const validation = joi.object({
     .required(),
 });
 
-const logValidation = joi.object({
-  email: joi.string().email().trim(true).required(),
-  password: joi.string().min(8).trim(true).required(),
-});
 
 const userValidation = async (req, res, next) => {
   const payload = {
@@ -34,6 +33,7 @@ const userValidation = async (req, res, next) => {
     phoneNumber: req.body.phoneNumber,
   };
 
+
   const { error } = validation.validate(payload);
   if (error) {
     res.status(406);
@@ -44,6 +44,13 @@ const userValidation = async (req, res, next) => {
     next();
   }
 };
+
+
+const logValidation = joi.object({
+  email: joi.string().email().trim(true).required(),
+  password: joi.string().min(8).trim(true).required(),
+});
+
 
 const loginValidation = async (req, res, next) => {
   const payload = {
