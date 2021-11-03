@@ -3,15 +3,11 @@ const mongoose = require("mongoose");
 const loginSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    require: true,
-    min: 3,
-    max: 20,
+    required: true,
   },
   lastName: {
     type: String,
-    require: true,
-    min: 3,
-    max: 20,
+    required: true,
   },
   dateOfBirth: {
     type: String,
@@ -21,18 +17,19 @@ const loginSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    max: 50,
     unique: true,
   },
   password: {
     type: String,
     required: true,
-    min: 6,
   },
   phoneNumber: {
     type: String,
     required: true,
-    //max:11,
+  },
+  resetLink: {
+    data: String,
+    default: "",
   },
 });
 

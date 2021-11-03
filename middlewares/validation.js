@@ -1,73 +1,25 @@
-const joi = require("joi");
-require("../utils/validationSchema");
+const createHttpError = require("http-errors");
+const Joi = require("joi");
+const Validators = require("../validators");
 
+module.exports = function (validator) {
+  //! If validator is not exist, throw err
+  if (!Validators.hasOwnProperty(validator))
+    throw new Error(`'${validator}' validator does not exist`);
 
-const errorFunction = (errorBit, msg, data) => {
-  if (errorBit) return { is_error: errorBit, message: msg };
-  else return { is_error: errorBit, message: msg, data };
-};
+  return async function (req, res, next) {
+    try {
+      const validated = await Validators[validator].validateAsync(req.body);
 
+      req.body = validated;
 
-const validation = joi.object({
-  firstName: joi.string().alphanum().min(3).max(25).trim(true).required(),
-  lastName: joi.string().alphanum().min(2).max(25).trim(true).required(),
-  dateOfBirth: joi.string().min(3).max(2000),
-  email: joi.string().email().trim(true).required(),
-  password: joi.string().min(8).trim(true).required(),
-  phoneNumber: joi
-    .string()
-    .length(10)
-    .pattern(/[6-9]{1}[0-9]{9}/)
-    .required(),
-});
-
-
-const userValidation = async (req, res, next) => {
-  const payload = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-
-    dateOfBirth: req.body.dateOfBirth,
-    email: req.body.email,
-    password: req.body.password,
-    phoneNumber: req.body.phoneNumber,
+      next();
+    } catch (err) {
+      //* Pass err to next
+      //! If validation error occurs call next with HTTP 422. Otherwise HTTP 500
+      if (err.isJoi)
+        return next(createHttpError(422, { message: err.message }));
+      next(createHttpError(500));
+    }
   };
-
-
-  const { error } = validation.validate(payload);
-  if (error) {
-    res.status(406);
-    return res.json(
-      errorFunction(true, `Error in User Data : ${error.message}`)
-    );
-  } else {
-    next();
-  }
 };
-
-
-const logValidation = joi.object({
-  email: joi.string().email().trim(true).required(),
-  password: joi.string().min(8).trim(true).required(),
-});
-
-
-const loginValidation = async (req, res, next) => {
-  const payload = {
-
-    email: req.body.email,
-    password: req.body.password,
-  };
-  const { error } = logValidation.validate(payload);
-  if (error) {
-    res.status(406);
-    return res.json(
-      errorFunction(true, `Invalid email or password : ${error.message}`)
-    );
-  } else {
-    next();
-  }
-};
-module.exports = userValidation;
-module.exports = loginValidation;
-
