@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const morgan = require("morgan");
-require("./helpers/redis");
+
 
 require("dotenv").config();
 
