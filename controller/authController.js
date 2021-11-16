@@ -8,8 +8,8 @@ const saltRounds = 10;
 const {
   signAccessToken,
   signRefreshToken,
-  verifyRefreshToken
-} = require('../helpers/jwt.helper')
+  verifyRefreshToken,
+} = require("../helpers/jwt.helper");
 
 module.exports = {
   register: async (req, res, next) => {
@@ -21,7 +21,6 @@ module.exports = {
     }
 
     bcrypt.hash(password, saltRounds, function (err, hash) {
-      // Store hash in your password DB.
       User.create({
         firstName,
         lastName,
@@ -64,48 +63,32 @@ module.exports = {
       let user = await User.findOne({ email });
       if (!user) throw createHttpError.NotFound("User not registered");
       if (user) {
-        
         const result = await bcrypt.compare(password, user.password);
-        
-          if (result) {
-            //console.log(result);
-            const accessToken = await signAccessToken(user.id);
-            //console.log(accessToken);
-            const refreshToken = await signRefreshToken(user.id);
-            res.status(200).json({message: "Login successfull!", accessToken, refreshToken});
-            // console.log(accessToken);
-            // console.log(refreshToken);
 
-            /////////////////////////////
-            // client.set(
-            //   `${newRefreshToken}`,
-            //   JSON.stringify({
-            //     refreshToken: refreshToken,
-            //     user_id: user._id,
-            //   }))
-            
+        if (result) {
+          const accessToken = await signAccessToken(user.id);
 
-
-
-
-          } else {
-            return next(createHttpError.BadRequest('Invalid Username/Password'));
-          }
-        
+          const refreshToken = await signRefreshToken(user.id);
+          res
+            .status(200)
+            .json({ message: "Login successfull!", accessToken, refreshToken });
+        } else {
+          return next(createHttpError.BadRequest("Invalid Username/Password"));
+        }
       }
     } catch (error) {
       next(error);
-    }},
-  
+    }
+  },
 
   refreshToken: async (req, res, next) => {
     try {
       const { refreshToken } = req.body;
-      // console.log(refreshToken);
+
       if (!refreshToken) throw createHttpError.BadRequest();
-      // const user = await User.findOne({ refreshToken });
+
       const userId = await verifyRefreshToken(refreshToken);
-      // console.log(user);
+
       const accessToken = await signAccessToken(userId);
       const refToken = await signRefreshToken(userId);
       res.send({ accessToken: accessToken, refreshToken: refToken });
@@ -113,5 +96,4 @@ module.exports = {
       next(error);
     }
   },
-}
-
+};
