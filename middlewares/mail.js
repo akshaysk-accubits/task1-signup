@@ -1,34 +1,38 @@
-var nodemailer = require('nodemailer');
-const mailGun = require('nodemailer-mailgun-transport');
-require('../models/signup');
-require('../routes/auth');
-
+var nodemailer = require("nodemailer");
+const mailGun = require("nodemailer-mailgun-transport");
+require("../models/signup");
+require("../routes/auth");
 
 const auth = {
   auth: {
-      api_key: process.env.API_KEY || '41ea30bf45290735882df6bdbdfca6d0-443ec20e-b8cc7745' , 
-      domain: process.env.DOMAIN || 'sandbox047ca4fc822540ee9b30b9a23e7d13c6.mailgun.org' 
-  }
+    api_key:
+      process.env.API_KEY ||
+      "d4bbd16b0dc5128822a8facd97fd25f6-20ebde82-0e704599",
+    domain:
+      process.env.DOMAIN ||
+      "sandbox320bc546b03447beb8be5ac9129dd66e.mailgun.org",
+  },
 };
 
 const transporter = nodemailer.createTransport(mailGun(auth));
 
-
-async function sendMail(email) {
+const sendMail = async (params) => {
+  console.log("params", params);
   var mailOptions = {
-  from: 'ask28696@gmail.com',
-  to: email,
-  subject: 'Sending Email using Node.js',
-  text: 'Welcome home !'
+    from: "ask28696@gmail.com",
+    to: params.to,
+    subject: params.subject,
+    text: params.text,
+    link: params.link,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
 };
 
-transporter.sendMail(mailOptions,  function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-});
-}
-
-module.exports.sendMail=sendMail;
+module.exports.sendMail = sendMail;
