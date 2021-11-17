@@ -2,9 +2,11 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 const nodemailer =require("nodemailer");
+const morgan = require("morgan");
 require('dotenv').config()
 
 const app = express();
+app.use(morgan("combined"));
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
