@@ -37,7 +37,7 @@ module.exports = {
             text: "Welcome!",
           };
           await sendMail(mailParams);
-          res.status(500).json({
+          res.status(200).json({
             message: "User created",
             result: result,
           });

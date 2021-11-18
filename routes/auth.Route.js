@@ -1,10 +1,11 @@
 const express = require('express')
 const router = require("express").Router();
 const AuthController = require('../controller/authController')
+const Validator = require("../middlewares/validation");
 
-router.post("/register", AuthController.register);
+router.post("/register", Validator("register"), AuthController.register);
 
-router.post("/login", AuthController.login);
+router.post("/login", Validator("register"), AuthController.login);
 
 router.post("/refresh-token", AuthController.refreshToken)
 
