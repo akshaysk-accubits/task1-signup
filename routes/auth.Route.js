@@ -5,7 +5,7 @@ const Validator = require("../middlewares/validation");
 
 router.post("/register", Validator("register"), AuthController.register);
 
-router.post("/login", Validator("register"), AuthController.login);
+router.post("/login", Validator("login"), AuthController.login);
 
 router.post("/refresh-token", AuthController.refreshToken)
 
