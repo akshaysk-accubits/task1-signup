@@ -1,31 +1,35 @@
 const express = require("express");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const nodemailer =require("nodemailer");
+
+const nodemailer = require("nodemailer");
 const morgan = require("morgan");
-require('dotenv').config()
+require("dotenv").config();
+require("./helpers/redis");
+
 
 const app = express();
 app.use(morgan("combined"));
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-require('./models/signup')
+require("./models/signup");
+app.use(morgan("combined"));
+app.use("/authentication", require("./routes/auth"));
 
-app.use('/authentication',require('./routes/auth'))
-
+app.use("/refresh", require("./routes/auth.Route"));
 
 //connect to DB
 mongoose.connect(
-    process.env.DB_URL,
-    { useNewUrlParser: true, useUnifiedTopology: true },
-    (err) => {
-      if (err) {
-        console.log(" err ", err);
-      } else console.log("Connected to DB");
-    }
-  );
+  process.env.DB_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  (err) => {
+    if (err) {
+      console.log(" err ", err);
+    } else console.log("Connected to DB");
+  }
+);
 
 
 //* Error Handler
@@ -41,7 +45,8 @@ app.use((err, req, res, next) => {
 
 
 app.listen(process.env.PORT, (err) => {
-    if (err) {
-        console.log('Error ', err);
-    }
-    console.log('Node.js is running at PORT',process.env.PORT)})
+  if (err) {
+    console.log("Error ", err);
+  }
+  console.log("Node.js is running at PORT", process.env.PORT);
+});
